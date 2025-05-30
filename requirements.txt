@@ -1,0 +1,10 @@
+pandas
+numpy
+matplotlib
+textblob
+nltk
+pynance
+TA-Lib
+yfinance
+scipy
+jupyter
