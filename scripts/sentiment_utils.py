@@ -1,18 +1,32 @@
-# indicator_calculator.py
+from textblob import TextBlob
 import pandas as pd
-import talib
 
-def calculate_rsi(df, period=14):
-    df['RSI'] = talib.RSI(df['Close'], timeperiod=period)
-    return df
+def get_sentiment_score(text):
+    """
+    Calculate sentiment polarity score for given text.
+    - Returns score between -1 (negative) to 1 (positive).
+    """
+    analysis = TextBlob(text)
+    return analysis.sentiment.polarity
 
-def calculate_moving_averages(df, short_window=50, long_window=200):
-    df[f'MA_{short_window}'] = df['Close'].rolling(window=short_window).mean()
-    df[f'MA_{long_window}'] = df['Close'].rolling(window=long_window).mean()
-    return df
+def get_sentiment_category(score):
+    """
+    Categorize sentiment score into Positive, Neutral, or Negative.
+    """
+    if score > 0.05:
+        return 'Positive'
+    elif score < -0.05:
+        return 'Negative'
+    else:
+        return 'Neutral'
 
-def calculate_macd(df):
-    macd, macdsignal, macdhist = talib.MACD(df['Close'])
-    df['MACD'] = macd
-    df['MACD_Signal'] = macdsignal
+def apply_sentiment_analysis(df, text_column='headline'):
+    """
+    Apply sentiment analysis to a DataFrame column containing text.
+    Adds two new columns:
+    - sentiment_score: Polarity score.
+    - sentiment_category: Positive, Neutral, or Negative.
+    """
+    df['sentiment_score'] = df[text_column].apply(get_sentiment_score)
+    df['sentiment_category'] = df['sentiment_score'].apply(get_sentiment_category)
     return df
